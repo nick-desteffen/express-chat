@@ -7,5 +7,16 @@
     <h1>Chat</h1>
     <p>Chat <%= email %></p>
     <img src='<%= gravatar %>' />
+    <div id="application">
+      <form action='/message' type='POST'>
+        <input type='hidden' name='email' id='email' value='<%= email %>' />
+        <textarea name='message' id='message'></textarea>
+        <a href="#" class="submit">Send Message</a>
+      </form>
+    </div>
+    <script type='text/javascript' src='/javascripts/jquery-2.0.0.min.js'></script>
+    <script type='text/javascript' src='/javascripts/underscore-min.js'></script>
+    <script type='text/javascript' src='/javascripts/backbone-min.js'></script>
+    <script type='text/javascript' src='/javascripts/chat/application.js'></script>
   </body>
 </html>
