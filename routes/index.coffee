@@ -1,2 +1,2 @@
-exports.index = (req, res)->
-  res.render('index', { title: 'Express' })
+exports.index = (request, response)->
+  response.render('index', { title: 'Express Chat' })

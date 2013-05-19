@@ -1,6 +1,6 @@
 express = require('express')
 routes  = require('./routes')
-user    = require('./routes/user')
+chat    = require('./routes/chat')
 http    = require('http')
 path    = require('path')
 redis   = require('redis')
@@ -25,7 +25,7 @@ if 'development' is app.get('env')
   app.use(express.errorHandler())
 
 app.get('/', routes.index)
-app.get('/users', user.list)
+app.post('/chat', chat.index)
 
 http.createServer(app).listen app.get('port'), ()->
   console.log("Express server listening on port #{app.get('port')}")
