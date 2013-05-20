@@ -14,9 +14,14 @@
     email = request.body.email;
     baseURL = "https://secure.gravatar.com/avatar/";
     gravatar = baseURL + crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex');
-    return response.render('chat', {
-      email: email,
-      gravatar: gravatar
+    return db.llen("chat", function(error, message_count) {
+      return db.lrange("chat", 0, message_count, function(error, messages) {
+        return response.render('chat', {
+          email: email,
+          gravatar: gravatar,
+          messages: messages
+        });
+      });
     });
   };
 

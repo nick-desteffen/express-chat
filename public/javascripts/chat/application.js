@@ -9,6 +9,11 @@
     events: {
       "click .submit": "sendMessage"
     },
+    initialize: function() {
+      return _.each(window.messages, function(message) {
+        return $("#messages").append("<p>" + message.message + "</p>");
+      });
+    },
     sendMessage: function(event) {
       var email, message;
 
@@ -28,6 +33,8 @@
     }
   });
 
-  window.application = new ExpressChat.View();
+  $(function() {
+    return window.application = new ExpressChat.View();
+  });
 
 }).call(this);

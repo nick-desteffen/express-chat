@@ -8,7 +8,9 @@ exports.index = (request, response)->
   baseURL = "https://secure.gravatar.com/avatar/"
   gravatar = baseURL + crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex')
 
-  response.render('chat', {email: email, gravatar: gravatar})
+  db.llen "chat", (error, message_count)->
+    db.lrange "chat", 0, message_count, (error, messages)->
+      response.render('chat', {email: email, gravatar: gravatar, messages: messages})
 
 exports.message = (request, response)->
   email   = request.body.email

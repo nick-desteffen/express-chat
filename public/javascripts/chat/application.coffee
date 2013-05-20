@@ -6,6 +6,10 @@ ExpressChat.View = Backbone.View.extend
   events:
     "click .submit": "sendMessage"
 
+  initialize: ()->
+    _.each window.messages, (message)->
+      $("#messages").append("<p>#{message.message}</p>")
+
   sendMessage: (event)->
     event.preventDefault()
     message = @$el.find("#message").val()
@@ -17,4 +21,5 @@ ExpressChat.View = Backbone.View.extend
       success: (a,b,c)->
         alert("Success!")
 
-window.application = new ExpressChat.View()
+$ ()->
+  window.application = new ExpressChat.View()
