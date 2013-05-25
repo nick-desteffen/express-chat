@@ -90,7 +90,8 @@
     payload = {
       email: email,
       body: body,
-      gravatar: gravatar
+      gravatar: gravatar,
+      timestamp: new Date().toString()
     };
     redis.lpush('chat', JSON.stringify(payload));
     faye.publish("/chat-messages", payload);

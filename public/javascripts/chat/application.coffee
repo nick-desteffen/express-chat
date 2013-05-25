@@ -4,13 +4,13 @@ ExpressChat.View = Backbone.View.extend
   el: "#application"
 
   events:
-    "click .submit": "sendMessage"
+    "click input[type='submit']": "sendMessage"
 
   initialize: ()->
     _.each window.messages, (message)=>
       @renderMessage(message)
 
-    faye = new Faye.Client('http://192.168.0.104:3000/faye');
+    faye = new Faye.Client('/faye');
     subscription = faye.subscribe '/chat-messages', (message)=>
       @renderMessage(message)
 
@@ -29,7 +29,7 @@ ExpressChat.View = Backbone.View.extend
     $.ajax '/message',
       data: payload,
       type: 'POST',
-      success: (data, status, xhr)=>
+      success: (data, status, xhr)->
         #@renderMessage(data)
 
   renderMessage: (message)->

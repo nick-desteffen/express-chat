@@ -52,9 +52,10 @@ app.post '/message', (request, response)->
   gravatar = gravatarBaseURL + Crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex')
 
   payload = {
-    email:    email,
-    body:     body,
-    gravatar: gravatar
+    email:     email,
+    body:      body,
+    gravatar:  gravatar,
+    timestamp: new Date().toString()
   }
 
   redis.lpush('chat', JSON.stringify(payload))

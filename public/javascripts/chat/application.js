@@ -7,7 +7,7 @@
   ExpressChat.View = Backbone.View.extend({
     el: "#application",
     events: {
-      "click .submit": "sendMessage"
+      "click input[type='submit']": "sendMessage"
     },
     initialize: function() {
       var faye, subscription,
@@ -16,14 +16,13 @@
       _.each(window.messages, function(message) {
         return _this.renderMessage(message);
       });
-      faye = new Faye.Client('http://192.168.0.104:3000/faye');
+      faye = new Faye.Client('/faye');
       return subscription = faye.subscribe('/chat-messages', function(message) {
         return _this.renderMessage(message);
       });
     },
     sendMessage: function(event) {
-      var emailField, messageField, payload,
-        _this = this;
+      var emailField, messageField, payload;
 
       event.preventDefault();
       emailField = this.$el.find("#email");

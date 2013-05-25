@@ -5,3 +5,27 @@ body {
 a {
   color: #00B7FF;
 }
+.message {
+  border: 1px solid #ccc;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+}
+.message span.body {
+  margin-left: 5px;
+  font-size: 13px;
+}
+.message span.timestamp {
+  font-size: 9px;
+}
+form {
+  margin: 10px;
+}
+form textarea {
+  border: 1px solid #ccc;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}

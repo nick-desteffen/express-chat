@@ -12,14 +12,16 @@
       </div>
       <form action='/message' type='POST'>
         <input type='hidden' name='email' id='email' value='<%= email %>' />
-        <textarea name='message' id='message'></textarea>
-        <a href="#" class="submit">Send Message</a>
+        <textarea name='message' id='message' rows="4" cols="100"></textarea>
+        <br>
+        <input type='submit' value='Send Message' />
       </form>
     </div>
     <script type='text/javascript' src='/javascripts/jquery-2.0.0.min.js'></script>
     <script type='text/javascript' src='/javascripts/underscore-min.js'></script>
     <script type='text/javascript' src='/javascripts/backbone-min.js'></script>
     <script type='text/javascript' src='/javascripts/ejs_production.js'></script>
+    <script type='text/javascript' src='/javascripts/moment.min.js'></script>
     <script type='text/javascript' src='/javascripts/chat/application.js'></script>
     <script type='text/javascript' src='/faye/client.js'></script>
     <script type="text/javascript">
