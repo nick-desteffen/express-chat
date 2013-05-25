@@ -10,26 +10,44 @@
       "click .submit": "sendMessage"
     },
     initialize: function() {
-      return _.each(window.messages, function(message) {
-        return $("#messages").append("<p>" + message.message + "</p>");
+      var faye, subscription,
+        _this = this;
+
+      _.each(window.messages, function(message) {
+        return _this.renderMessage(message);
+      });
+      faye = new Faye.Client('http://192.168.0.104:3000/faye');
+      return subscription = faye.subscribe('/chat-messages', function(message) {
+        return _this.renderMessage(message);
       });
     },
     sendMessage: function(event) {
-      var email, message;
+      var emailField, messageField, payload,
+        _this = this;
 
       event.preventDefault();
-      message = this.$el.find("#message").val();
-      email = this.$el.find("#email").val();
+      emailField = this.$el.find("#email");
+      messageField = this.$el.find("#message");
+      payload = {
+        email: emailField.val(),
+        body: messageField.val()
+      };
+      messageField.val("");
       return $.ajax('/message', {
-        data: {
-          email: email,
-          message: message
-        },
+        data: payload,
         type: 'POST',
-        success: function(a, b, c) {
-          return alert("Success!");
-        }
+        success: function(data, status, xhr) {}
       });
+    },
+    renderMessage: function(message) {
+      var html;
+
+      html = new EJS({
+        url: '/javascripts/chat/_message.ejs'
+      }).render({
+        message: message
+      });
+      return $("#messages").append(html);
     }
   });
 

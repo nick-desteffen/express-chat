@@ -7,19 +7,34 @@ ExpressChat.View = Backbone.View.extend
     "click .submit": "sendMessage"
 
   initialize: ()->
-    _.each window.messages, (message)->
-      $("#messages").append("<p>#{message.message}</p>")
+    _.each window.messages, (message)=>
+      @renderMessage(message)
+
+    faye = new Faye.Client('http://192.168.0.104:3000/faye');
+    subscription = faye.subscribe '/chat-messages', (message)=>
+      @renderMessage(message)
 
   sendMessage: (event)->
     event.preventDefault()
-    message = @$el.find("#message").val()
-    email   = @$el.find("#email").val()
+    emailField   = @$el.find("#email")
+    messageField = @$el.find("#message")
+
+    payload = {
+      email: emailField.val(),
+      body:  messageField.val()
+    }
+
+    messageField.val("")
 
     $.ajax '/message',
-      data: {email: email, message: message},
+      data: payload,
       type: 'POST',
-      success: (a,b,c)->
-        alert("Success!")
+      success: (data, status, xhr)=>
+        #@renderMessage(data)
+
+  renderMessage: (message)->
+    html = new EJS(url: '/javascripts/chat/_message.ejs').render(message: message)
+    $("#messages").append(html)
 
 $ ()->
   window.application = new ExpressChat.View()
