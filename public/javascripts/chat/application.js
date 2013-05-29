@@ -10,26 +10,32 @@
       "click input[type='submit']": "sendMessage"
     },
     initialize: function() {
-      var faye, subscription,
+      var room, subscription,
         _this = this;
 
+      room = $("#room").val();
       _.each(window.messages, function(message) {
         return _this.renderMessage(message);
       });
-      faye = new Faye.Client('/faye');
-      return subscription = faye.subscribe('/chat-messages', function(message) {
+      this.faye = new Faye.Client('/faye');
+      subscription = this.faye.subscribe("/chat-messages/" + room, function(message) {
         return _this.renderMessage(message);
       });
+      return this.setupProfile();
     },
     sendMessage: function(event) {
-      var emailField, messageField, payload;
+      var emailField, messageField, payload, roomField;
 
       event.preventDefault();
       emailField = this.$el.find("#email");
       messageField = this.$el.find("#message");
+      roomField = this.$el.find("#room");
       payload = {
         email: emailField.val(),
-        body: messageField.val()
+        body: messageField.val(),
+        name: this.name,
+        location: this.location,
+        room: roomField.val()
       };
       messageField.val("");
       return $.ajax('/message', {
@@ -47,6 +53,23 @@
         message: message
       });
       return $("#messages").append(html);
+    },
+    setupProfile: function() {
+      var _ref;
+
+      if ((_ref = window.profile) != null ? _ref.entry : void 0) {
+        this.profile = window.profile.entry[0];
+        if (this.profile.name) {
+          this.name = this.profile.name.formatted;
+        } else {
+          this.name = this.profile.displayName;
+        }
+        this.location = this.profile.currentLocation || 'Unknown';
+      } else {
+        this.name = "Anonymous";
+        this.location = "Unknown";
+      }
+      return $("#name").text("" + this.name + " (" + this.location + ")");
     }
   });
 

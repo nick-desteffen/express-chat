@@ -6,11 +6,13 @@
   </head>
   <body>
     <h1>Express-Chat</h1>
-    <p>Welcome to Express-Chat</p>
+    <p>Express-Chat uses your <a href='http://gravatar.com' target="_blank">Gravatar</a> profile.  If you don't want to setup your Gravatar profile you can still enter your email and remain anonymous.</a></p>
     <form action='/chat' method='POST'>
-      <label for='email'>Please enter your email address:</label><br>
-      <input type='email' id='email' name='email'/>
-      <input type='submit' />
+      <label for='email'>Email</label><br>
+      <input type='email' id='email' name='email'/><br><br>
+      <label for='room'>Chat Room</label><br>
+      <input type='text' id='room' name='room'/><br><br>
+      <input type='submit' value='Chat' />
     </form>
   </body>
 </html>

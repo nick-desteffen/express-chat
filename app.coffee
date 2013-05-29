@@ -5,14 +5,10 @@ Faye    = require('faye')
 Crypto  = require('crypto')
 Redis   = require('redis')
 
-redis = Redis.createClient()
-
-gravatarBaseURL = "https://secure.gravatar.com/avatar/"
-
+redis  = Redis.createClient()
 bayeux = new Faye.NodeAdapter(mount: '/faye', timeout: 45)
-faye  = bayeux.getClient()
-
-app = Express()
+faye   = bayeux.getClient()
+app    = Express()
 
 app.set('port', process.env.PORT || 3000)
 app.set('views', __dirname + '/views')
@@ -30,6 +26,11 @@ app.use(Express.static(Path.join(__dirname, 'public')))
 if 'development' is app.get('env')
   app.use(Express.errorHandler())
 
+### Helpers ###
+
+gravatar = (email)->
+  Crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex')
+
 ### Routes ###
 
 ## Index
@@ -39,27 +40,28 @@ app.get '/', (request, response)->
 ## Chatroom
 app.post '/chat', (request, response)->
   email = request.body.email
-  gravatar = gravatarBaseURL + Crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex')
+  room  = request.body.room
+  console.log(room)
 
-  redis.llen "chat", (error, message_count)->
-    redis.lrange "chat", 0, message_count, (error, messages)->
-      response.render('chat', {email: email, gravatar: gravatar, messages: messages})
+  redis.llen "chat:#{room}", (error, message_count)->
+    redis.lrange "chat:#{room}", 0, message_count, (error, messages)->
+      response.render('chat', {email: email, room: room, gravatar: gravatar(email), messages: messages})
 
 ## Submit message
 app.post '/message', (request, response)->
-  email    = request.body.email
-  body     = request.body.body
-  gravatar = gravatarBaseURL + Crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex')
+  email = request.body.email
+  body  = request.body.body
+  room  = request.body.room
 
   payload = {
     email:     email,
     body:      body,
-    gravatar:  gravatar,
+    gravatar:  gravatar(email),
     timestamp: new Date().toString()
   }
 
-  redis.lpush('chat', JSON.stringify(payload))
-  faye.publish "/chat-messages", payload
+  redis.lpush("chat:#{room}", JSON.stringify(payload))
+  faye.publish "/chat-messages/#{room}", payload
   response.send(payload)
 
 ### Server Configuration ###
