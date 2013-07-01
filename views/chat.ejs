@@ -6,10 +6,8 @@
   <body>
     <div id="application">
       <h1>Chat &ndash; <%= room %></h1>
-      <p id="name"></p>
-      <img src='https://secure.gravatar.com/avatar/<%= gravatar %>' />
-      <div id="messages">
-      </div>
+      <div id="people"></div>
+      <div id="messages"></div>
       <form action='/message' type='POST'>
         <input type='hidden' name='email' id='email' value='<%= email %>' />
         <input type='hidden' name='room' id='room' value='<%= room %>' />
@@ -28,10 +26,7 @@
 
     <script type="text/javascript">
       var messages = [<%- messages %>];
-      function profileLoaded(profile){
-        window.profile = profile;
-      }
+      var people   = [<%- people %>];
     </script>
-    <script type='text/javascript' src='https://secure.gravatar.com/<%= gravatar %>.json?callback=profileLoaded'></script>
   </body>
 </html>

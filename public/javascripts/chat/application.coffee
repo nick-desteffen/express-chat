@@ -7,15 +7,20 @@ ExpressChat.View = Backbone.View.extend
     "click input[type='submit']": "sendMessage"
 
   initialize: ()->
-    room = $("#room").val()
+    @room = $("#room").val()
+
     _.each window.messages, (message)=>
       @renderMessage(message)
 
+    _.each window.people, (person)=>
+      @renderPerson(person)
+
     @faye = new Faye.Client('/faye')
-    subscription = @faye.subscribe "/chat-messages/#{room}", (message)=>
+    @messagesSubscription = @faye.subscribe "/chat-messages/#{@room}", (message)=>
       @renderMessage(message)
 
-    @setupProfile()
+    @peopleSubscription = @faye.subscribe "/people/#{@room}", (person)=>
+      @renderPerson(person)
 
   sendMessage: (event)->
     event.preventDefault()
@@ -43,20 +48,10 @@ ExpressChat.View = Backbone.View.extend
     html = new EJS(url: '/javascripts/chat/_message.ejs').render(message: message)
     $("#messages").append(html)
 
-  setupProfile: ()->
-    if window.profile?.entry
-      @profile = window.profile.entry[0]
-      if @profile.name
-        @name = @profile.name.formatted
-      else
-        @name = @profile.displayName
-
-      @location = @profile.currentLocation || 'Unknown'
-    else
-      @name = "Anonymous"
-      @location = "Unknown"
-
-    $("#name").text("#{@name} (#{@location})")
+  renderPerson: (person)->
+    unless $("#people").find("[data-email='#{person.email}']").length > 0
+      html = new EJS(url: '/javascripts/chat/_person.ejs').render(person: person)
+      $("#people").append(html)
 
 $ ()->
   window.application = new ExpressChat.View()

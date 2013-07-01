@@ -1,5 +1,6 @@
 Express = require('express')
 Http    = require('http')
+Https   = require('https')
 Path    = require('path')
 Faye    = require('faye')
 Crypto  = require('crypto')
@@ -28,8 +29,48 @@ if 'development' is app.get('env')
 
 ### Helpers ###
 
-gravatar = (email)->
+gravatarEmailHash = (email)->
   Crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex')
+
+joinChat = (email, room)->
+  gravatarHash = gravatarEmailHash(email)
+  options = {
+    host: "secure.gravatar.com"
+    port: 443
+    path: "/#{gravatarHash}.json"
+  }
+
+  output = ""
+  get = Https.get options, (response) ->
+    response.setEncoding('utf8')
+    response.on "data", (chunk) ->
+      output += chunk
+    response.on "end", ()->
+      if response.statusCode is 404
+        redis.sadd("people:#{room}", JSON.stringify({name: "Anonymous", email: email, location: "Unknown"}))
+      else
+        gravatar_profile = JSON.parse(output).entry[0]
+        location = gravatar_profile.currentLocation || 'Unknown'
+
+        if gravatar_profile.name
+          name = gravatar_profile.name.formatted
+        else
+          name = gravatar_profile.displayName
+
+        payload = {
+          name:     name,
+          email:    email,
+          location: location,
+          gravatar: gravatarHash
+        }
+
+        redis.sadd("people:#{room}", JSON.stringify(payload))
+        faye.publish "/people/#{room}", payload
+
+  get.on "error", (error) ->
+    console.log "Error retrieving Gravatar profile: #{error.message}"
+
+  get.end()
 
 ### Routes ###
 
@@ -41,11 +82,21 @@ app.get '/', (request, response)->
 app.post '/chat', (request, response)->
   email = request.body.email
   room  = request.body.room
-  console.log(room)
+  joinChat(email, room)
 
-  redis.llen "chat:#{room}", (error, message_count)->
-    redis.lrange "chat:#{room}", 0, message_count, (error, messages)->
-      response.render('chat', {email: email, room: room, gravatar: gravatar(email), messages: messages})
+  redis.lrange "chat:#{room}", 0, -1, (error, messages)->
+    redis.smembers "people:#{room}", (error, people)->
+      response.render('chat', {email: email, room: room, messages: messages, people: people})
+
+## People
+app.get '/people', (request, response)->
+  room  = request.query.room
+  redis.smembers "people:#{room}", (error, people)->
+    if people.length > 0
+      json = JSON.parse(people)
+    else
+      json = {}
+    response.send(json)
 
 ## Submit message
 app.post '/message', (request, response)->
@@ -56,13 +107,13 @@ app.post '/message', (request, response)->
   payload = {
     email:     email,
     body:      body,
-    gravatar:  gravatar(email),
+    gravatar:  gravatarEmailHash(email),
     timestamp: new Date().toString()
   }
 
   redis.lpush("chat:#{room}", JSON.stringify(payload))
   faye.publish "/chat-messages/#{room}", payload
-  response.send(payload)
+  #response.send(payload)
 
 ### Server Configuration ###
 

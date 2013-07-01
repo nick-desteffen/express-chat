@@ -10,18 +10,22 @@
       "click input[type='submit']": "sendMessage"
     },
     initialize: function() {
-      var room, subscription,
-        _this = this;
+      var _this = this;
 
-      room = $("#room").val();
+      this.room = $("#room").val();
       _.each(window.messages, function(message) {
         return _this.renderMessage(message);
       });
+      _.each(window.people, function(person) {
+        return _this.renderPerson(person);
+      });
       this.faye = new Faye.Client('/faye');
-      subscription = this.faye.subscribe("/chat-messages/" + room, function(message) {
+      this.messagesSubscription = this.faye.subscribe("/chat-messages/" + this.room, function(message) {
         return _this.renderMessage(message);
       });
-      return this.setupProfile();
+      return this.peopleSubscription = this.faye.subscribe("/people/" + this.room, function(person) {
+        return _this.renderPerson(person);
+      });
     },
     sendMessage: function(event) {
       var emailField, messageField, payload, roomField;
@@ -54,22 +58,17 @@
       });
       return $("#messages").append(html);
     },
-    setupProfile: function() {
-      var _ref;
+    renderPerson: function(person) {
+      var html;
 
-      if ((_ref = window.profile) != null ? _ref.entry : void 0) {
-        this.profile = window.profile.entry[0];
-        if (this.profile.name) {
-          this.name = this.profile.name.formatted;
-        } else {
-          this.name = this.profile.displayName;
-        }
-        this.location = this.profile.currentLocation || 'Unknown';
-      } else {
-        this.name = "Anonymous";
-        this.location = "Unknown";
+      if (!($("#people").find("[data-email='" + person.email + "']").length > 0)) {
+        html = new EJS({
+          url: '/javascripts/chat/_person.ejs'
+        }).render({
+          person: person
+        });
+        return $("#people").append(html);
       }
-      return $("#name").text("" + this.name + " (" + this.location + ")");
     }
   });
 
