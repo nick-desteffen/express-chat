@@ -88,16 +88,6 @@ app.post '/chat', (request, response)->
     redis.smembers "people:#{room}", (error, people)->
       response.render('chat', {email: email, room: room, messages: messages, people: people})
 
-## People
-app.get '/people', (request, response)->
-  room  = request.query.room
-  redis.smembers "people:#{room}", (error, people)->
-    if people.length > 0
-      json = JSON.parse(people)
-    else
-      json = {}
-    response.send(json)
-
 ## Submit message
 app.post '/message', (request, response)->
   email = request.body.email
@@ -113,7 +103,7 @@ app.post '/message', (request, response)->
 
   redis.lpush("chat:#{room}", JSON.stringify(payload))
   faye.publish "/chat-messages/#{room}", payload
-  #response.send(payload)
+  response.send(201)
 
 ### Server Configuration ###
 

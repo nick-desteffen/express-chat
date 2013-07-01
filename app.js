@@ -140,22 +140,6 @@
     });
   });
 
-  app.get('/people', function(request, response) {
-    var room;
-
-    room = request.query.room;
-    return redis.smembers("people:" + room, function(error, people) {
-      var json;
-
-      if (people.length > 0) {
-        json = JSON.parse(people);
-      } else {
-        json = {};
-      }
-      return response.send(json);
-    });
-  });
-
   app.post('/message', function(request, response) {
     var body, email, payload, room;
 
@@ -169,7 +153,8 @@
       timestamp: new Date().toString()
     };
     redis.lpush("chat:" + room, JSON.stringify(payload));
-    return faye.publish("/chat-messages/" + room, payload);
+    faye.publish("/chat-messages/" + room, payload);
+    return response.send(201);
   });
 
   /* Server Configuration
