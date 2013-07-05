@@ -13,6 +13,19 @@
       var _this = this;
 
       this.room = $("#room").val();
+      window.messages.sort(function(a, b) {
+        a = moment(a.timestamp).toDate();
+        b = moment(b.timestamp).toDate();
+        if (a < b) {
+          return -1;
+        } else {
+          if (a > b) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }
+      });
       _.each(window.messages, function(message) {
         return _this.renderMessage(message);
       });
@@ -42,11 +55,7 @@
         room: roomField.val()
       };
       messageField.val("");
-      return $.ajax('/message', {
-        data: payload,
-        type: 'POST',
-        success: function(data, status, xhr) {}
-      });
+      return $.post('/message', payload);
     },
     renderMessage: function(message) {
       var html;

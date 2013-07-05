@@ -3,16 +3,34 @@
   <head>
     <title>Express-Chat</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script type='text/javascript' src='/javascripts/jquery-2.0.0.min.js'></script>
   </head>
   <body>
     <h1>Express-Chat</h1>
     <p>Express-Chat uses your <a href='http://gravatar.com' target="_blank">Gravatar</a> profile.  If you don't want to setup your Gravatar profile you can still enter your email and remain anonymous.</a></p>
-    <form action='/chat' method='POST'>
-      <label for='email'>Email</label><br>
-      <input type='email' id='email' name='email'/><br><br>
-      <label for='room'>Chat Room</label><br>
-      <input type='text' id='room' name='room'/><br><br>
-      <input type='submit' value='Chat' />
-    </form>
+    <h2>Existing Rooms</h2>
+    <div class="box">
+      <% for(var i=0; i < rooms.length; i++) { %>
+        <a href="#" class="room"><%= rooms[i] %></a><br>
+      <% } %>
+    </div>
+    <div class="box">
+      <form action='/chat' method='POST'>
+        <label for='email'>Email</label><br>
+        <input type='email' id='email' name='email'/><br><br>
+        <label for='room'>Chat Room</label><br>
+        <input type='text' id='room' name='room'/><br><br>
+        <input type='submit' value='Chat' />
+      </form>
+    </div>
+    <script type='text/javascript'>
+      $(function(){
+        $(".room").on("click", function(event){
+          event.preventDefault();
+          var link = $(event.target);
+          $("#room").val(link.text());
+        })
+      })
+    </script>
   </body>
 </html>

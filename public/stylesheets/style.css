@@ -5,7 +5,7 @@ body {
 a {
   color: #00B7FF;
 }
-.message {
+.box {
   border: 1px solid #ccc;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -13,12 +13,23 @@ a {
   padding: 10px;
   margin: 10px;
 }
-.message span.body {
+#messages {
+  clear: both;
+}
+#messages .message span.body {
   margin-left: 5px;
   font-size: 13px;
 }
-.message span.timestamp {
+#messages .message span.timestamp {
   font-size: 9px;
+}
+#people {
+  clear: both;
+}
+#people .person {
+  margin: 10px;
+  float: left;
+  text-align: center;
 }
 form {
   margin: 10px;

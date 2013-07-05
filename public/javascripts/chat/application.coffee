@@ -9,6 +9,11 @@ ExpressChat.View = Backbone.View.extend
   initialize: ()->
     @room = $("#room").val()
 
+    window.messages.sort (a, b) ->
+      a = moment(a.timestamp).toDate()
+      b = moment(b.timestamp).toDate()
+      (if a < b then -1 else (if a > b then 1 else 0))
+
     _.each window.messages, (message)=>
       @renderMessage(message)
 
@@ -37,12 +42,7 @@ ExpressChat.View = Backbone.View.extend
     }
 
     messageField.val("")
-
-    $.ajax '/message',
-      data: payload,
-      type: 'POST',
-      success: (data, status, xhr)->
-        #@renderMessage(data)
+    $.post '/message', payload
 
   renderMessage: (message)->
     html = new EJS(url: '/javascripts/chat/_message.ejs').render(message: message)

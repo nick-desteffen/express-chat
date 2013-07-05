@@ -7,6 +7,7 @@ Crypto  = require('crypto')
 Redis   = require('redis')
 
 redis  = Redis.createClient()
+redis.select(10)
 bayeux = new Faye.NodeAdapter(mount: '/faye', timeout: 45)
 faye   = bayeux.getClient()
 app    = Express()
@@ -47,7 +48,12 @@ joinChat = (email, room)->
       output += chunk
     response.on "end", ()->
       if response.statusCode is 404
-        redis.sadd("people:#{room}", JSON.stringify({name: "Anonymous", email: email, location: "Unknown"}))
+        payload = {
+          name:     "Anonymous",
+          email:    email,
+          location: "Unknown",
+          gravatar: gravatarHash
+        }
       else
         gravatar_profile = JSON.parse(output).entry[0]
         location = gravatar_profile.currentLocation || 'Unknown'
@@ -64,8 +70,9 @@ joinChat = (email, room)->
           gravatar: gravatarHash
         }
 
-        redis.sadd("people:#{room}", JSON.stringify(payload))
-        faye.publish "/people/#{room}", payload
+      redis.sadd("people:#{room}", JSON.stringify(payload))
+      redis.sadd("rooms", room)
+      faye.publish "/people/#{room}", payload
 
   get.on "error", (error) ->
     console.log "Error retrieving Gravatar profile: #{error.message}"
@@ -76,7 +83,8 @@ joinChat = (email, room)->
 
 ## Index
 app.get '/', (request, response)->
-  response.render('index')
+  redis.smembers "rooms", (error, rooms)->
+    response.render('index', {rooms: rooms})
 
 ## Chatroom
 app.post '/chat', (request, response)->

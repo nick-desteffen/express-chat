@@ -18,6 +18,8 @@
 
   redis = Redis.createClient();
 
+  redis.select(10);
+
   bayeux = new Faye.NodeAdapter({
     mount: '/faye',
     timeout: 45
@@ -84,11 +86,12 @@
         var gravatar_profile, location, name, payload;
 
         if (response.statusCode === 404) {
-          return redis.sadd("people:" + room, JSON.stringify({
+          payload = {
             name: "Anonymous",
             email: email,
-            location: "Unknown"
-          }));
+            location: "Unknown",
+            gravatar: gravatarHash
+          };
         } else {
           gravatar_profile = JSON.parse(output).entry[0];
           location = gravatar_profile.currentLocation || 'Unknown';
@@ -103,9 +106,10 @@
             location: location,
             gravatar: gravatarHash
           };
-          redis.sadd("people:" + room, JSON.stringify(payload));
-          return faye.publish("/people/" + room, payload);
         }
+        redis.sadd("people:" + room, JSON.stringify(payload));
+        redis.sadd("rooms", room);
+        return faye.publish("/people/" + room, payload);
       });
     });
     get.on("error", function(error) {
@@ -119,7 +123,11 @@
 
 
   app.get('/', function(request, response) {
-    return response.render('index');
+    return redis.smembers("rooms", function(error, rooms) {
+      return response.render('index', {
+        rooms: rooms
+      });
+    });
   });
 
   app.post('/chat', function(request, response) {

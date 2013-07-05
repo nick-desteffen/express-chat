@@ -7,20 +7,36 @@ a {
   color: #00B7FF;
 }
 
-.message{
+.box{
   border: 1px solid #ccc;
   -webkit-border-radius: 5px;
      -moz-border-radius: 5px;
           border-radius: 5px;
   padding: 10px;
   margin: 10px;
+}
 
-  span.body{
-    margin-left: 5px;
-    font-size: 13px;
+#messages{
+  clear: both;
+
+  .message{
+    span.body{
+      margin-left: 5px;
+      font-size: 13px;
+    }
+    span.timestamp{
+      font-size: 9px;
+    }
   }
-  span.timestamp{
-    font-size: 9px;
+}
+
+#people{
+  clear: both;
+
+  .person{
+    margin: 10px;
+    float: left;
+    text-align: center;
   }
 }
 
