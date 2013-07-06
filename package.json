@@ -1,6 +1,6 @@
 {
-  "name": "application-name",
-  "version": "0.0.1",
+  "name": "express-chat",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "node app.js"
@@ -11,6 +11,6 @@
     "less-middleware": "*",
     "redis": "*",
     "faye": "*",
-    "common-node": "*"
+    "forever": "*"
   }
 }
