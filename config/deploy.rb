@@ -2,7 +2,8 @@ require "capistrano/node-deploy"
 
 set :application, "express-chat"
 set :repository,  "git@github.com:nick-desteffen/express-chat.git"
-set :user, "nickd"
+set :node_user, "nickd"
+set :node_binary, "/usr/local/bin/node"
 set :scm, :git
 set :deploy_to, "/var/www/apps/express-chat"
 set :use_sudo, false
