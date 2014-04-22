@@ -85,14 +85,7 @@
       return response.on("end", function() {
         var gravatar_profile, location, name, payload;
 
-        if (response.statusCode === 404) {
-          payload = {
-            name: "Anonymous",
-            email: email,
-            location: "Unknown",
-            gravatar: gravatarHash
-          };
-        } else {
+        if (response.statusCode === 200) {
           gravatar_profile = JSON.parse(output).entry[0];
           location = gravatar_profile.currentLocation || 'Unknown';
           if (gravatar_profile.name) {
@@ -104,6 +97,13 @@
             name: name,
             email: email,
             location: location,
+            gravatar: gravatarHash
+          };
+        } else {
+          payload = {
+            name: "Anonymous",
+            email: email,
+            location: "Unknown",
             gravatar: gravatarHash
           };
         }

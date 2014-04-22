@@ -47,14 +47,7 @@ joinChat = (email, room)->
     response.on "data", (chunk) ->
       output += chunk
     response.on "end", ()->
-      if response.statusCode is 404
-        payload = {
-          name:     "Anonymous",
-          email:    email,
-          location: "Unknown",
-          gravatar: gravatarHash
-        }
-      else
+      if response.statusCode is 200
         gravatar_profile = JSON.parse(output).entry[0]
         location = gravatar_profile.currentLocation || 'Unknown'
 
@@ -67,6 +60,13 @@ joinChat = (email, room)->
           name:     name,
           email:    email,
           location: location,
+          gravatar: gravatarHash
+        }
+      else
+        payload = {
+          name:     "Anonymous",
+          email:    email,
+          location: "Unknown",
           gravatar: gravatarHash
         }
 
