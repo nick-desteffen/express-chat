@@ -39,6 +39,9 @@ joinChat = (email, room)->
     host: "secure.gravatar.com"
     port: 443
     path: "/#{gravatarHash}.json"
+    headers: {
+      "User-Agent": "express-chat"
+    }
   }
 
   output = ""
